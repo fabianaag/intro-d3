@@ -36,7 +36,36 @@
     "use strict"
 
     function desenhaBarras(dados) {
-      // Preencha aqui.
+      var largura = 200,
+          altura = 500;
+
+      const posicaoBarraX = 0;
+      const posicaoBarraY = altura / dados.length;
+      const larguraBarra = altura / dados.length - 2;
+
+      var svg = d3.select('#chart')
+                .append('svg')
+                .attr('width', largura)
+                .attr('height', altura);
+
+      /* Edite o código abaixo para criar um gráfico de barras horizontais
+       *
+       * Crie funções que a partir dos dados definem os atributos x, y, width
+       * e height dos retângulos que são as barras.
+       *
+       * Dica: você pode criar funções de dois parâmetros (function(d, i)) para
+       * isso, onde o primeiro (d) é o dado e o segundo (i) é o índice desse dado.
+       * O índice é importante para dizer onde a barra será desenhada, por exemplo.
+       * (Nem pense em fazer hardcoded :)).
+       */
+      svg.selectAll('rect')
+          .data(dados)
+          .enter()
+            .append('rect')
+              .attr('x', posicaoBarraX) // A função com dois parâmetros pode entrar aqui
+              .attr('y', function(d, i){return i * posicaoBarraY}) // e aqui
+              .attr('width', function(d){return 1000 * d.valor})
+              .attr('height', larguraBarra);
     }
 
     d3.tsv('dados/alphabet.tsv', function(dados) {

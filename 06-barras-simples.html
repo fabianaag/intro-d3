@@ -19,6 +19,9 @@
       .mychart rect {
         fill: steelblue;
       }
+      .mychart rect:hover {
+        fill: blue;
+      }
 
       .mychart text {
         fill: white;
@@ -32,6 +35,10 @@
       var dados = [40, 80, 96, 76, 23, 42, 32, 90, 11, 22, 14];
       var largura = 200,
           altura = 500;
+
+      const posicaoBarraX = 0;
+      const posicaoBarraY = altura / dados.length;
+      const larguraBarra = altura / dados.length - 2;
 
       var svg = d3.select('#chart')
                 .append('svg')
@@ -48,15 +55,14 @@
        * O índice é importante para dizer onde a barra será desenhada, por exemplo.
        * (Nem pense em fazer hardcoded :)).
        */
-
       svg.selectAll('rect')
           .data(dados)
           .enter()
             .append('rect')
-              .attr('x', 0) // A função com dois parâmetros pode entrar aqui
-              .attr('y', 0) // e aqui
-              .attr('width', 30)
-              .attr('height', 20);
+              .attr('x', posicaoBarraX) // A função com dois parâmetros pode entrar aqui
+              .attr('y', function(d, i){return i * posicaoBarraY}) // e aqui
+              .attr('width', function(d){return d})
+              .attr('height', larguraBarra);
 
       /* Mais dicas :
        * - As barras ficam mais legíveis se não encostarem umas nas outras. Para isso

@@ -77,13 +77,36 @@
       /*
        * As escalas
        */
-      var x = d3.scaleBand(); // Configure essa escala com domain, range e padding
 
-      var y = d3.scaleLinear() // Configure essa escala com domain e range
+       var minValue = function(dados){
+         var menor = +Infinity;
+         for (var i = 0; i < dados.length; i++) {
+           if(dados[i].valor < menor) menor = dados[i];
+         }
+         return menor;
+       }
+
+      var maxValue = function(dados){
+        var maior = -Infinity;
+        for (var i = 0; i < dados.length; i++) {
+          if(dados[i].valor > maior) maior = dados[i];
+        }
+        return maior;
+      }
+
+      var x = d3.scaleBand()
+                .domain([1, maxValue(dados)])
+                .range([maxValue(dados), 1])
+                .paddingInner(2); // Configure essa escala com domain, range e padding
+
+      var y = d3.scaleLinear()
+                .domain([1, maxValue(dados)])
+                .range([maxValue(dados), 1]);      // Configure essa escala com domain e range
                                // Lembre que uma escala pode converter de 1..10 -> 100..1
 
       // === ATÉ DAQUI ===
 
+      console.log(x.bandwidth())
       /*
        * As marcas
        */
