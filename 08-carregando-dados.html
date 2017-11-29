@@ -36,36 +36,66 @@
     "use strict"
 
     function desenhaBarras(dados) {
-      var largura = 200,
-          altura = 500;
+      // definicoes de altura e largura do svg e da vis dentro
+      var alturaSVG = 400, larguraSVG = 900;
+      var	margin = {top: 10, right: 20, bottom:30, left: 45}, // para descolar a vis das bordas do grafico
+          larguraVis = larguraSVG - margin.left - margin.right,
+          alturaVis = alturaSVG - margin.top - margin.bottom;
 
-      const posicaoBarraX = 0;
-      const posicaoBarraY = altura / dados.length;
-      const larguraBarra = altura / dados.length - 2;
-
-      var svg = d3.select('#chart')
-                .append('svg')
-                .attr('width', largura)
-                .attr('height', altura);
-
-      /* Edite o código abaixo para criar um gráfico de barras horizontais
-       *
-       * Crie funções que a partir dos dados definem os atributos x, y, width
-       * e height dos retângulos que são as barras.
-       *
-       * Dica: você pode criar funções de dois parâmetros (function(d, i)) para
-       * isso, onde o primeiro (d) é o dado e o segundo (i) é o índice desse dado.
-       * O índice é importante para dizer onde a barra será desenhada, por exemplo.
-       * (Nem pense em fazer hardcoded :)).
+      /*
+       * Prepara onde adicionaremos a visualizacao
        */
-      svg.selectAll('rect')
-          .data(dados)
-          .enter()
-            .append('rect')
-              .attr('x', posicaoBarraX) // A função com dois parâmetros pode entrar aqui
-              .attr('y', function(d, i){return i * posicaoBarraY}) // e aqui
-              .attr('width', function(d){return 1000 * d.valor})
-              .attr('height', larguraBarra);
+      var grafico = d3.select('#chart') // cria elemento <svg> com um <g> dentro
+        .append('svg')
+          .attr('width', larguraVis + margin.left + margin.right)
+          .attr('height', alturaVis + margin.top + margin.bottom)
+        .append('g') // para entender o <g> vá em x03-detalhes-svg.html
+          .attr('transform', 'translate(' +  margin.left + ',' + margin.top + ')');
+
+      // === EDITE DAQUI ===
+      /*
+       * As escalas
+       */
+
+      var x = d3.scaleBand()
+                .domain(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X', 'W', 'Y', 'Z'])
+                .rangeRound([0, larguraVis])
+                .paddingInner(0.1)
+                .paddingOuter(0.2); // Configure essa escala com domain, range e padding
+
+      var y = d3.scaleLinear()
+                .domain(d3.extent(dados, (d, i) => d.valor))
+                .rangeRound([alturaVis, 0]);      // Configure essa escala com domain e range
+                               // Lembre que uma escala pode converter de 1..10 -> 100..1
+
+      // === ATÉ DAQUI ===
+      /*
+       * As marcas
+       */
+      grafico.selectAll('g')
+              .data(dados)
+              .enter()
+                .append('rect')
+                  .attr('x', d => x(d.letra))   // usando a escala definida acima
+                  .attr('width', x.bandwidth()) // largura da barra via escala
+                  .attr('y', d => y(d.valor))
+                  .attr('height', (d) => alturaVis - y(d.valor)); // de cabeca para baixo
+
+      /*
+       * Os eixos
+       */
+      grafico.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + alturaVis + ")")
+              .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
+
+      grafico.append('g')
+              .attr('transform', 'translate(0,0)')
+              .call(d3.axisLeft(y))  // gera eixo a partir da escala
+
+      grafico.append("text")
+        .attr("transform", "translate(-30," + (alturaVis + margin.top)/2 + ") rotate(-90)")
+        .text("Frequencia");
     }
 
     d3.tsv('dados/alphabet.tsv', function(dados) {
